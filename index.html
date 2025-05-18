@@ -1,125 +1,155 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Chapel Manager</title>
-  </head>
-  <body>
-    <h1>Chapel Manager Login</h1>
-    <input type="email" id="email" placeholder="Email" /><br />
-    <input type="password" id="password" placeholder="Password" /><br />
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chapel Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: 20px;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px 0;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #message {
+      color: green;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Chapel Manager Login</h1>
+
+  <div class="card" id="loginCard">
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
     <button onclick="signup()">Sign Up</button>
     <button onclick="login()">Login</button>
+  </div>
 
-    <div id="mainApp" style="display: none;">
-      <h2>Welcome to Chapel Manager</h2>
-      <!-- Add your app content here -->
-      <div id="dataArea" style="display: none;">
-        <h2>People Database</h2>
-        <input type="text" id="pname" placeholder="Name" />
-        <input type="number" id="page" placeholder="Age" />
-        <button onclick="addPerson()">Add Person</button>
-        <h3>People List:</h3>
-        <div id="peopleList"></div>
-      </div>
-      
-    </div>
+  <div class="card" id="dataArea" style="display: none;">
+    <h2>Welcome to Chapel Manager</h2>
+    <input type="text" id="pname" placeholder="Person Name" />
+    <input type="number" id="page" placeholder="Person Age" />
+    <button onclick="addPerson()">Add Person</button>
+    <div id="message"></div>
+    <br>
+    <button onclick="window.location.href='view.html'">View List</button>
+  </div>
 
-    <!-- ✅ Firebase Setup as Module -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-      import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyBxMPfrEkpkp4W3ArEdAJrK6l3B_modsQI",
-        authDomain: "chapel-manager.firebaseapp.com",
-        projectId: "chapel-manager",
-        storageBucket: "chapel-manager.firebasestorage.app",
-        messagingSenderId: "748555240838",
-        appId: "1:748555240838:web:812a2c1ac3b0f7caddd807",
-        measurementId: "G-KS2LRLVYZZ"
-      };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBxMPfrEkpkp4W3ArEdAJrK6l3B_modsQI",
+      authDomain: "chapel-manager.firebaseapp.com",
+      projectId: "chapel-manager",
+      storageBucket: "chapel-manager.firebasestorage.app",
+      messagingSenderId: "748555240838",
+      appId: "1:748555240838:web:812a2c1ac3b0f7caddd807",
+      measurementId: "G-KS2LRLVYZZ"
+    };
 
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const peopleCol = collection(db, "people");
 
-      // Make functions globally accessible
-      window.signup = async () => {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+    
 
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-          alert("User registered!");
-        } catch (error) {
-          alert("Signup Error: " + error.message);
-          console.error(error);
-        }
-      };
+    window.signup = async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert("Signed up!");
+        showApp();
+      } catch (error) {
+        alert(error.message);
+      }
+    };
 
-      
+    window.login = async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Logged in!");
+        showApp();
+      } catch (error) {
+        alert(error.message);
+      }
+    };
 
-      window.login = async () => {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+    function showApp() {
+      document.getElementById("loginCard").style.display = "none";
+      document.getElementById("dataArea").style.display = "block";
+    }
 
-        document.getElementById("dataArea").style.display = "block";
-        loadPeople();
+    window.addPerson = async () => {
+      const name = document.getElementById("pname").value;
+      const age = document.getElementById("page").value;
+      const msg = document.getElementById("message");
 
+      if (!name || !age) return alert("Please fill in all fields.");
 
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-          document.getElementById("mainApp").style.display = "block";
-          alert("Logged in!");
-        } catch (error) {
-          alert("Login Error: " + error.message);
-          console.error(error);
-        }
-      };
+      try {
+       
 
-      import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+await addDoc(peopleCol, {
+  name,
+  age,
+  createdAt: serverTimestamp()
+});
 
-const db = getFirestore(app);
+        document.getElementById("pname").value = "";
+        document.getElementById("page").value = "";
+        msg.textContent = "Person added successfully!";
+        setTimeout(() => msg.textContent = "", 3000);
+      } catch (error) {
+        alert("Error adding person: " + error.message);
+      }
+    };
+  </script>
 
-const peopleCol = collection(db, "people");
-
-// Function to add person
-window.addPerson = async () => {
-  const name = document.getElementById("pname").value;
-  const age = document.getElementById("page").value;
-
-  if (!name || !age) return alert("Fill in both fields!");
-
-  try {
-    await addDoc(peopleCol, { name, age });
-    alert("Person added!");
-    loadPeople();
-  } catch (err) {
-    console.error("Error adding person:", err);
-  }
-};
-
-// Function to load all people
-window.loadPeople = async () => {
-  const peopleList = document.getElementById("peopleList");
-  peopleList.innerHTML = "";
-
-  const snapshot = await getDocs(peopleCol);
-  snapshot.forEach((docSnap) => {
-    const person = docSnap.data();
-    const div = document.createElement("div");
-    div.innerHTML = `${person.name} (Age: ${person.age}) 
-      <button onclick="deletePerson('${docSnap.id}')">Delete</button>`;
-    peopleList.appendChild(div);
-  });
-};
-
-// Function to delete person
-window.deletePerson = async (id) => {
-  await deleteDoc(doc(db, "people", id));
-  alert("Deleted!");
-  loadPeople();
-};
-
-    </script>
-  </body>
+</body>
 </html>
