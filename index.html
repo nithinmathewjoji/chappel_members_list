@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chapel Manager</title>
+  </head>
+  <body>
+    <h1>Chapel Manager Login</h1>
+    <input type="email" id="email" placeholder="Email" /><br />
+    <input type="password" id="password" placeholder="Password" /><br />
+    <button onclick="signup()">Sign Up</button>
+    <button onclick="login()">Login</button>
+
+    <div id="mainApp" style="display: none;">
+      <h2>Welcome to Chapel Manager</h2>
+      <!-- Add your app content here -->
+      <div id="dataArea" style="display: none;">
+        <h2>People Database</h2>
+        <input type="text" id="pname" placeholder="Name" />
+        <input type="number" id="page" placeholder="Age" />
+        <button onclick="addPerson()">Add Person</button>
+        <h3>People List:</h3>
+        <div id="peopleList"></div>
+      </div>
+      
+    </div>
+
+    <!-- ✅ Firebase Setup as Module -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+      import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBxMPfrEkpkp4W3ArEdAJrK6l3B_modsQI",
+        authDomain: "chapel-manager.firebaseapp.com",
+        projectId: "chapel-manager",
+        storageBucket: "chapel-manager.firebasestorage.app",
+        messagingSenderId: "748555240838",
+        appId: "1:748555240838:web:812a2c1ac3b0f7caddd807",
+        measurementId: "G-KS2LRLVYZZ"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      // Make functions globally accessible
+      window.signup = async () => {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          alert("User registered!");
+        } catch (error) {
+          alert("Signup Error: " + error.message);
+          console.error(error);
+        }
+      };
+
+      
+
+      window.login = async () => {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        document.getElementById("dataArea").style.display = "block";
+        loadPeople();
+
+
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          document.getElementById("mainApp").style.display = "block";
+          alert("Logged in!");
+        } catch (error) {
+          alert("Login Error: " + error.message);
+          console.error(error);
+        }
+      };
+
+      import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+const db = getFirestore(app);
+
+const peopleCol = collection(db, "people");
+
+// Function to add person
+window.addPerson = async () => {
+  const name = document.getElementById("pname").value;
+  const age = document.getElementById("page").value;
+
+  if (!name || !age) return alert("Fill in both fields!");
+
+  try {
+    await addDoc(peopleCol, { name, age });
+    alert("Person added!");
+    loadPeople();
+  } catch (err) {
+    console.error("Error adding person:", err);
+  }
+};
+
+// Function to load all people
+window.loadPeople = async () => {
+  const peopleList = document.getElementById("peopleList");
+  peopleList.innerHTML = "";
+
+  const snapshot = await getDocs(peopleCol);
+  snapshot.forEach((docSnap) => {
+    const person = docSnap.data();
+    const div = document.createElement("div");
+    div.innerHTML = `${person.name} (Age: ${person.age}) 
+      <button onclick="deletePerson('${docSnap.id}')">Delete</button>`;
+    peopleList.appendChild(div);
+  });
+};
+
+// Function to delete person
+window.deletePerson = async (id) => {
+  await deleteDoc(doc(db, "people", id));
+  alert("Deleted!");
+  loadPeople();
+};
+
+    </script>
+  </body>
+</html>
