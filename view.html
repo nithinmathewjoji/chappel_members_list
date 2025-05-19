@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>View Members</title>
+  <title>People List</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,7 +11,7 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 800px;
       margin: auto;
       background: white;
       padding: 20px;
@@ -21,30 +21,6 @@
 
     h2 {
       margin-top: 0;
-    }
-
-    .person {
-      background: #f9f9f9;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      position: relative;
-    }
-
-    .person button {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 5px 10px;
-      cursor: pointer;
-    }
-
-    .person button:hover {
-      background-color: #c0392b;
     }
 
     .back-btn, .download-btn {
@@ -58,8 +34,29 @@
       color: white;
     }
 
-    .download-btn:hover {
+    .download-btn:hover, .back-btn:hover {
       background-color: #2980b9;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #3498db;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
     }
   </style>
 </head>
@@ -68,17 +65,25 @@
   <div class="container">
     <button class="back-btn" onclick="window.location.href='index.html'">← Back</button>
     <button class="download-btn" onclick="downloadPDF()">⬇ Download as PDF</button>
-    <h2>Keezhukara YuvajanaSakhyam Members List</h2>
-    <div id="peopleList"></div>
+    <h2>People List</h2>
+    <table id="peopleTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+        </tr>
+      </thead>
+      
+      <tbody id="peopleList"></tbody>
+    </table>
   </div>
 
-  <!-- Include html2pdf.js library -->
+  <!-- Include html2pdf.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-    import { query, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBxMPfrEkpkp4W3ArEdAJrK6l3B_modsQI",
@@ -100,32 +105,28 @@
 
       const q = query(peopleCol, orderBy("createdAt"));
       const snapshot = await getDocs(q);
-      
+
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
-        const div = document.createElement("div");
-        div.className = "person";
-        div.innerHTML = `
-          ${data.name} (Age: ${data.age})
+        const tr = document.createElement("tr");
+        const createdAt = data.createdAt?.toDate().toLocaleString() || "";
+        tr.innerHTML = `
+          <td>${data.name}</td>
+          <td>${data.age}</td>
           
         `;
-        list.appendChild(div);
+        list.appendChild(tr);
       });
     }
 
-    window.deletePerson = async (id) => {
-      await deleteDoc(doc(db, "people", id));
-      loadPeople();
-    };
-
     window.downloadPDF = () => {
-      const element = document.getElementById("peopleList");
+      const element = document.getElementById("peopleTable");
       const opt = {
         margin:       0.5,
         filename:     'people-list.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
       };
       html2pdf().set(opt).from(element).save();
     };
