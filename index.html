@@ -122,7 +122,11 @@
       <div id="dataArea" style="display: none;">
         <input type="text" id="pname" placeholder="Person Name" />
         <input type="number" id="page" placeholder="Person Age" />
-        <button onclick="addPerson()">Add Person</button>
+        <input type="text" id="gender" placeholder="Gender" />
+        <input type="date" id="dob" placeholder="Date of Birth" />
+        <input type="text" id="blood" placeholder="Blood Type" />
+
+        <button onclick="addPerson()">Add New Member</button>
         <button onclick="deletePerson()">Delete by Name</button>
         <button onclick="goToView()">Go to View Page</button>
         
@@ -132,7 +136,7 @@
 
   </div>
   <div class="footer">
-    © 2025 Keezhukara YuvajanaSakhyam. All rights reserved.
+    © 2025 Chapel Manager. All rights reserved.
   </div>
   
 
@@ -203,6 +207,10 @@
     window.addPerson = async () => {
       const name = document.getElementById("pname").value;
       const age = document.getElementById("page").value;
+      const gender = document.getElementById("gender").value;
+      const dob = document.getElementById("dob").value;
+      const blood = document.getElementById("blood").value;
+
       const msg = document.getElementById("message");
 
       if (!name || !age) return alert("Please fill in all fields.");
@@ -211,8 +219,12 @@
         await addDoc(peopleCol, {
           name,
           age,
+          gender,
+          dob,
+          blood,
           createdAt: serverTimestamp()
         });
+        
 
         document.getElementById("pname").value = "";
         document.getElementById("page").value = "";
