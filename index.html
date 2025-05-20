@@ -114,15 +114,14 @@
         
         <input type="email" id="email" placeholder="Email" />
         <input type="password" id="password" placeholder="Password" />
-<!--        
         <button onclick="signup()">Sign Up</button>
--->
         <button onclick="login()">Login</button>
         <h3>contact admin if you forget login</h3>
       </div>
 
       <div id="dataArea" style="display: none;">
         <input type="text" id="pname" placeholder="Person Name" />
+        <textarea id="home" placeholder="Address"></textarea>
         <input type="number" id="page" placeholder="Person Age" />
         <input type="text" id="gender" placeholder="Gender" />
         <input type="date" id="dob" placeholder="Date of Birth" />
@@ -138,7 +137,7 @@
 
   </div>
   <div class="footer">
-    © 2025 Keezhukara YuvajanaSakhyam. All rights reserved.
+    © 2025 Chapel Manager. All rights reserved.
   </div>
   
 
@@ -208,6 +207,7 @@
 
     window.addPerson = async () => {
       const name = document.getElementById("pname").value;
+      const home = document.getElementById("home").value;
       const age = document.getElementById("page").value;
       const gender = document.getElementById("gender").value;
       const dob = document.getElementById("dob").value;
@@ -220,6 +220,7 @@
       try {
         await addDoc(peopleCol, {
           name,
+          home,
           age,
           gender,
           dob,
