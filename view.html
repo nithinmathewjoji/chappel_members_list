@@ -84,14 +84,18 @@
         <tr>
           <th>Name</th>
           <th>Age</th>
+          <th>Gender</th>
+          <th>DOB</th>
+          <th>Blood</th>
         </tr>
+        
       </thead>
       
       <tbody id="peopleList"></tbody>
     </table>
   </div>
   <div class="footer">
-    © 2025 Keezhukara YuvajanaSakhyam . All rights reserved.
+    © 2025 Chapel Manager. All rights reserved.
   </div>
   
   <!-- Include html2pdf.js -->
@@ -129,8 +133,11 @@
         tr.innerHTML = `
           <td>${data.name}</td>
           <td>${data.age}</td>
-          
+          <td>${data.gender || ""}</td>
+          <td>${data.dob || ""}</td>
+          <td>${data.blood || ""}</td>
         `;
+
         list.appendChild(tr);
       });
     }
