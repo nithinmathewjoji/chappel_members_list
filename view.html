@@ -83,6 +83,7 @@
       <thead>
         <tr>
           <th>Name</th>
+          <th>Address</th>
           <th>Age</th>
           <th>Gender</th>
           <th>DOB</th>
@@ -95,7 +96,7 @@
     </table>
   </div>
   <div class="footer">
-    © 2025 Keezhukara YuvajanaSakhyam. All rights reserved.
+    © 2025 Chapel Manager. All rights reserved.
   </div>
   
   <!-- Include html2pdf.js -->
@@ -132,6 +133,7 @@
         const createdAt = data.createdAt?.toDate().toLocaleString() || "";
         tr.innerHTML = `
           <td>${data.name}</td>
+          <td>${data.home}</td>
           <td>${data.age}</td>
           <td>${data.gender || ""}</td>
           <td>${data.dob || ""}</td>
